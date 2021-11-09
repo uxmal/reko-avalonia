@@ -1,0 +1,72 @@
+﻿  <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Reko.UserInterfaces.Avalonia</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaXaml Remove="AvaloniaDemo\**" />
+    <Compile Remove="AvaloniaDemo\**" />
+    <EmbeddedResource Remove="AvaloniaDemo\**" />
+    <None Remove="AvaloniaDemo\**" />
+    <Folder Include="Views\Dialogs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
+    <PackageReference Include="Dock.Avalonia" Version="0.10.10" />
+    <PackageReference Include="Dock.Model.ReactiveUI" Version="0.10.10" />
+    <PackageReference Include="Markdown.Avalonia" Version="0.10.7" />
+    <PackageReference Include="Reko.Decompiler.Runtime" Version="0.10.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Reko.Gui">
+      <HintPath>..\..\..\master\src\Gui\bin\Debug\netstandard2.1\Reko.Gui.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Update="App.axaml">
+      <SubType>Designer</SubType>
+    </AvaloniaXaml>
+  </ItemGroup>
+  <ItemGroup>
+    <!--<Compile Update="App.axaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>App.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\PropertiesView.axaml.cs">
+      <DependentUpon>PropertiesView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\OutputView.axaml.cs">
+      <DependentUpon>OutputView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\ConsoleView.axaml.cs">
+      <DependentUpon>ConsoleView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\CallHierarchyView.axaml.cs">
+      <DependentUpon>CallHierarchyView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\FindResultsView.axaml.cs">
+      <DependentUpon>FindResultsView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\ProcedureListView.axaml.cs">
+      <DependentUpon>ProcedureListView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MainView.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Tools\DiagnosticsView.axaml.cs">
+      <DependentUpon>DiagnosticsView.axaml</DependentUpon>
+    </Compile>-->
+  </ItemGroup>
+</Project>
