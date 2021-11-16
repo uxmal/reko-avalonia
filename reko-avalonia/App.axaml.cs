@@ -64,6 +64,9 @@ namespace Reko.UserInterfaces.Avalonia
                     {
                         DataContext = mainWindowViewModel
                     };
+					//$REVIEW: is there a better way to provide the MainWindow to the
+                    // view model? We want to show modal dialogs.
+                    mainWindowViewModel.MainWindow = mainWindow;
 
                     mainWindow.Closing += (_, _) =>
                     {

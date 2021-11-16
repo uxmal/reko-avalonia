@@ -4,6 +4,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using ReactiveUI;
 using Reko.Core;
+using Reko.UserInterfaces.Avalonia.Views;
 
 namespace Reko.UserInterfaces.Avalonia.ViewModels
 {
@@ -11,14 +12,6 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
     {
         private readonly IFactory? _factory;
         private IRootDock? _layout;
-
-        public IRootDock? Layout
-        {
-            get => _layout;
-            set => this.RaiseAndSetIfChanged(ref _layout, value);
-        }
-
-        public ICommand NewLayout { get; }
 
         public MainWindowViewModel()
         {
@@ -37,7 +30,18 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
             }
 
             NewLayout = ReactiveCommand.Create(ResetLayout);
+            FileOpen = ReactiveCommand.Create(OpenFile);
         }
+
+        public IRootDock? Layout
+        {
+            get => _layout;
+            set => this.RaiseAndSetIfChanged(ref _layout, value);
+        }
+
+        public ICommand NewLayout { get; }
+        public ICommand FileOpen { get; }
+        public MainWindow? MainWindow { get; set; }
 
         private void DebugFactoryEvents(IFactory factory)
         {
@@ -144,6 +148,15 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
                     dock.Close.Execute(null);
                 }
             }
+        }
+
+        public async void OpenFile()
+        {
+            if (MainWindow is null)
+                throw new System.InvalidOperationException($"Property {nameof(MainWindow)}) must be set.");
+            var dlg = new global::Avalonia.Controls.OpenFileDialog();
+            var files = await dlg.ShowAsync(MainWindow);
+            var _ = files?.Length;
         }
 
         public void ResetLayout()

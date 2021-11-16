@@ -9,10 +9,6 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <AvaloniaXaml Remove="AvaloniaDemo\**" />
-    <Compile Remove="AvaloniaDemo\**" />
-    <EmbeddedResource Remove="AvaloniaDemo\**" />
-    <None Remove="AvaloniaDemo\**" />
     <Folder Include="Views\Dialogs\" />
   </ItemGroup>
   <ItemGroup>
