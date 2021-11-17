@@ -31,7 +31,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
 
         public override IRootDock CreateLayout()
         {
-            var document1 = new DocumentViewModel {Id = "Document1", Title = "Document1"};
+            var document1 = new MemoryViewModel {Id = "Document1", Title = "Memory View"};
             var document2 = new DocumentViewModel {Id = "Document2", Title = "Document2"};
             var document3 = new DocumentViewModel {Id = "Document3", Title = "Document3", CanClose = true};
             
