@@ -6,7 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Reko.UserInterfaces.Avalonia.Views.Documents.MemoryView">
   <StackPanel>
-    <rc:HexViewer Background="#EEFFEE">
+    <rc:HexViewer Background="#EEFFEE"
+                  MemoryArea="{Binding MemoryArea}">
     </rc:HexViewer>
   </StackPanel>
 </UserControl>

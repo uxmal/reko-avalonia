@@ -9,6 +9,7 @@ using ReactiveUI;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Controls;
+using Reko.Core;
 
 namespace Reko.UserInterfaces.Avalonia.Controls
 {
@@ -26,27 +27,44 @@ namespace Reko.UserInterfaces.Avalonia.Controls
                 o => o.MemoryArea,
                 (o, v) => o.MemoryArea = v);
 
+        public static DirectProperty<HexViewer, Address?> TopAddressProperty =
+            AvaloniaProperty.RegisterDirect<HexViewer, Address?>(
+                nameof(TopAddress),
+                o => o.TopAddress,
+                (o, v) => o.TopAddress = v);
+
         private MemoryArea? mem;
         private List<ClientSpan> spans;
+        private Address? addrTop;
 
         public HexViewer()
         {
             this.spans = new List<ClientSpan>();
             this.InitializeComponent();
+            this.ClearVisualElements();
+            this.GenerateVisualElements();
+        }
+
+        private void GenerateVisualElements()
+        {
             spans.Add(new ClientSpan(new Rect(10, 10, 400, 300)));
+            spans.Add(new TextSpan("Hello Reko!", new Rect(20, 20, 100, 200)));
+        }
+
+        private void ClearVisualElements()
+        {
+            this.spans = new List<ClientSpan>();
         }
 
         private void InitializeComponent()
         {
-            this.VisualChildren.Clear();
         }
 
         public MemoryArea? MemoryArea
         {
             get { return this.mem; }
-            set { 
-                this.mem = value; 
-                this.SetAndRaise(MemoryAreaProperty, ref this.mem, value);
+            set { if (this.SetAndRaise(MemoryAreaProperty, ref this.mem, value))
+                    OnMemoryAreaChanged();
             }
         }
 
@@ -62,6 +80,12 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             set { SetValue(ForegroundProperty, value); }
         }
 
+        public Address? TopAddress
+        {
+            get { return this.addrTop; }
+            set { SetAndRaise(TopAddressProperty, ref this.addrTop, value); }
+        }
+
         public override void Render(DrawingContext context)
         {
             var bounds = Bounds;
@@ -74,6 +98,17 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             foreach (var span in spans)
             {
                 span.Render(this, context);
+            }
+        }
+
+        private void OnMemoryAreaChanged()
+        {
+            ClearVisualElements();
+            var mem = this.MemoryArea;
+            if (mem is not null)
+            {
+                GenerateVisualElements();
+                this.TopAddress = mem.BaseAddress;
             }
         }
     }
