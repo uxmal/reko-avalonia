@@ -21,19 +21,19 @@ namespace Reko.UserInterfaces.Avalonia.Controls
 
             public Rect Bounds { get; }
 
-            public virtual void Render(HexViewer hexViewer, DrawingContext dc)
+            public virtual void Render(HexViewer hexViewer, DrawingContext dc, Typeface face, double size)
             {
-                dc.FillRectangle(Brushes.Red, Bounds, 3);
+                dc.FillRectangle(Brushes.Red, Bounds, 0);
             }
         }
 
         public class TextSpan : ClientSpan
         {
             public static StyledProperty<double> FontSizeProperty =
-                global::Avalonia.Controls.TextBlock.FontSizeProperty.AddOwner<TextSpan>();
+                HexViewer.FontSizeProperty.AddOwner<TextSpan>();
 
             public static StyledProperty<FontFamily> FontFamilyProperty =
-                global::Avalonia.Controls.TextBlock.FontFamilyProperty.AddOwner<TextSpan>();
+                HexViewer.FontFamilyProperty.AddOwner<TextSpan>();
 
 
             public TextSpan(string text, Rect bounds)
@@ -44,11 +44,9 @@ namespace Reko.UserInterfaces.Avalonia.Controls
 
             public string Text { get; set; }
 
-            public override void Render(HexViewer hexViewer, DrawingContext dc)
+            public override void Render(HexViewer hexViewer, DrawingContext dc, Typeface font, double size)
             {
                 dc.FillRectangle(Brushes.White, Bounds);
-                var size = GetValue(FontSizeProperty);
-                var font = new Typeface(GetValue(FontFamilyProperty));
                 var fg = GetValue(ForegroundProperty);
                 var tx = new TextLayout(this.Text, font, size, fg);
                 using (dc.PushPostTransform(Matrix.CreateTranslation(Bounds.Left, Bounds.Top)))

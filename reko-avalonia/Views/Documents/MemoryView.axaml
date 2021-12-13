@@ -6,8 +6,16 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Reko.UserInterfaces.Avalonia.Views.Documents.MemoryView">
   <StackPanel>
+    <StackPanel Orientation="Horizontal"
+                VerticalAlignment="Center">
+      <TextBlock>Address:</TextBlock>
+      <TextBox></TextBox>
+    </StackPanel>
+    
     <rc:HexViewer Background="#EEFFEE"
-                  MemoryArea="{Binding MemoryArea}">
+                  MemoryArea="{Binding MemoryArea}"
+				  FontFamily="Lucida Console">
     </rc:HexViewer>
+    
   </StackPanel>
 </UserControl>
