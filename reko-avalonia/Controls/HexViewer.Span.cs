@@ -25,6 +25,12 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             {
                 dc.FillRectangle(Brushes.Red, Bounds, 0);
             }
+
+            public virtual void Render(HexViewer2 hexViewer, DrawingContext dc, Typeface face, double size)
+            {
+                dc.FillRectangle(Brushes.Red, Bounds, 0);
+            }
+
         }
 
         public class TextSpan : ClientSpan
@@ -45,6 +51,17 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             public string Text { get; set; }
 
             public override void Render(HexViewer hexViewer, DrawingContext dc, Typeface font, double size)
+            {
+                dc.FillRectangle(Brushes.White, Bounds);
+                var fg = GetValue(ForegroundProperty);
+                var tx = new TextLayout(this.Text, font, size, fg);
+                using (dc.PushPostTransform(Matrix.CreateTranslation(Bounds.Left, Bounds.Top)))
+                {
+                    tx.Draw(dc);
+                }
+            }
+
+            public override void Render(HexViewer2 hexViewer, DrawingContext dc, Typeface font, double size)
             {
                 dc.FillRectangle(Brushes.White, Bounds);
                 var fg = GetValue(ForegroundProperty);

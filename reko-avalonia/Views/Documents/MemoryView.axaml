@@ -5,17 +5,17 @@
              xmlns:rc="using:Reko.UserInterfaces.Avalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Reko.UserInterfaces.Avalonia.Views.Documents.MemoryView">
-  <StackPanel>
-    <StackPanel Orientation="Horizontal"
-                VerticalAlignment="Center">
-      <TextBlock>Address:</TextBlock>
-      <TextBox></TextBox>
-    </StackPanel>
-    
-    <rc:HexViewer Background="#EEFFEE"
-                  MemoryArea="{Binding MemoryArea}"
-				  FontFamily="Lucida Console">
-    </rc:HexViewer>
-    
-  </StackPanel>
+	<StackPanel>
+		<StackPanel Orientation="Horizontal"
+					VerticalAlignment="Center">
+			<TextBlock>Address:</TextBlock>
+			<TextBox></TextBox>
+		</StackPanel>
+		<ScrollViewer>
+			<rc:HexViewer2 Background="#EEFFEE"
+						  MemoryArea="{Binding MemoryArea}"
+						  FontFamily="Lucida Console">
+			</rc:HexViewer2>
+		</ScrollViewer>
+	</StackPanel>
 </UserControl>

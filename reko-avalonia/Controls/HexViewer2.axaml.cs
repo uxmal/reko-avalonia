@@ -1,4 +1,7 @@
-﻿using Reko.Core.Memory;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Reko.Core.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,46 +16,17 @@ using Reko.Core;
 using System.Diagnostics;
 using Avalonia.Media.TextFormatting;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 
 namespace Reko.UserInterfaces.Avalonia.Controls
 {
-    public partial class HexViewer : UserControl
+    public partial class HexViewer2 : UserControl, ILogicalScrollable
     {
-        private static readonly TraceSwitch trace = new TraceSwitch(nameof(HexViewer), "")
+        public HexViewer2()
         {
-            Level = TraceLevel.Verbose
-        };
+            this.InitializeComponent();
 
-
-        public static DirectProperty<HexViewer, MemoryArea?> MemoryAreaProperty =
-            AvaloniaProperty.RegisterDirect<HexViewer, MemoryArea?>(
-                nameof(MemoryArea),
-                o => o.MemoryArea,
-                (o, v) => o.MemoryArea = v);
-
-        public static DirectProperty<HexViewer, EndianServices> EndiannessProperty =
-            AvaloniaProperty.RegisterDirect<HexViewer, EndianServices>(
-                nameof(Endianness),
-                o => o.Endianness,
-                (o, v) => o.Endianness = v);
-
-        public static DirectProperty<HexViewer, Address?> TopAddressProperty =
-            AvaloniaProperty.RegisterDirect<HexViewer, Address?>(
-                nameof(TopAddress),
-                o => o.TopAddress,
-                (o, v) => o.TopAddress = v);
-
-        private MemoryArea? mem;
-        private List<RenderedLine> lines;
-        private List<ClientSpan> spans;
-        private Address? addrTop;
-        private EndianServices endianness;
-        private int cbLine;
-        private int cbCellStride;
-
-        public HexViewer()
-        {
-            this.spans = new List<ClientSpan>();
+            this.spans = new List<HexViewer.ClientSpan>();
             this.lines = new List<RenderedLine>();
             this.cbLine = 16;
             this.cbCellStride = 1;
@@ -62,7 +36,6 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             var mem = new ByteMemoryArea(Address.Ptr32(0), new byte[20000]);
             rnd.NextBytes(mem.Bytes);
 
-            this.InitializeComponent();
             this.ClearVisualElements();
             this.GenerateVisualElements();
         }
@@ -70,17 +43,50 @@ namespace Reko.UserInterfaces.Avalonia.Controls
 
         private void InitializeComponent()
         {
+            AvaloniaXamlLoader.Load(this);
         }
 
-       
+
+        private static readonly TraceSwitch trace = new TraceSwitch(nameof(HexViewer2), "")
+        {
+            Level = TraceLevel.Verbose
+        };
+
+
+        public static DirectProperty<HexViewer2, MemoryArea?> MemoryAreaProperty =
+            AvaloniaProperty.RegisterDirect<HexViewer2, MemoryArea?>(
+                nameof(MemoryArea),
+                o => o.MemoryArea,
+                (o, v) => o.MemoryArea = v);
+
+        public static DirectProperty<HexViewer2, EndianServices> EndiannessProperty =
+            AvaloniaProperty.RegisterDirect<HexViewer2, EndianServices>(
+                nameof(Endianness),
+                o => o.Endianness,
+                (o, v) => o.Endianness = v);
+
+        public static DirectProperty<HexViewer2, Address?> TopAddressProperty =
+            AvaloniaProperty.RegisterDirect<HexViewer2, Address?>(
+                nameof(TopAddress),
+                o => o.TopAddress,
+                (o, v) => o.TopAddress = v);
+
+        private MemoryArea? mem;
+        private List<RenderedLine> lines;
+        private List<HexViewer.ClientSpan> spans;
+        private Address? addrTop;
+        private EndianServices endianness;
+        private int cbLine;
+        private int cbCellStride;
+        private bool vScroll;
 
         private class RenderedLine
         {
             public double yTop;
-            public TextSpan[] spans = default!;
+            public HexViewer.TextSpan[] spans = default!;
         }
 
-        
+
 
         public EndianServices Endianness
         {
@@ -91,7 +97,9 @@ namespace Reko.UserInterfaces.Avalonia.Controls
         public MemoryArea? MemoryArea
         {
             get { return this.mem; }
-            set { if (this.SetAndRaise(MemoryAreaProperty, ref this.mem, value))
+            set
+            {
+                if (this.SetAndRaise(MemoryAreaProperty, ref this.mem, value))
                     OnMemoryAreaChanged();
             }
         }
@@ -102,9 +110,24 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             set { SetAndRaise(TopAddressProperty, ref this.addrTop, value); }
         }
 
+        bool ILogicalScrollable.CanHorizontallyScroll { get; set; }
+        bool ILogicalScrollable.CanVerticallyScroll { get => vScroll; set { this.vScroll = value; } }
+
+        bool ILogicalScrollable.IsLogicalScrollEnabled => true;
+
+        Size ILogicalScrollable.ScrollSize => new Size(100, 1);
+
+        Size ILogicalScrollable.PageScrollSize => new Size(100, 30);
+
+        Size IScrollable.Extent => new Size(100, 300);
+
+        Vector IScrollable.Offset { get; set; }
+
+        Size IScrollable.Viewport => new Size(100, 30);
+
         protected override Size MeasureOverride(Size availableSize)
         {
-            trace.Verbose($"{nameof(HexViewer)}.{nameof(MeasureOverride)}: {availableSize}");
+            trace.Verbose($"{nameof(HexViewer2)}.{nameof(MeasureOverride)}: {availableSize}");
             return base.MeasureOverride(availableSize);
         }
 
@@ -112,7 +135,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
         {
             var x = this.Content;
             var bounds = Bounds;
-            var client = new Rect(0, 0, bounds.Width-50, bounds.Height-30);
+            var client = new Rect(0, 0, bounds.Width - 50, bounds.Height - 30);
 
             var bg = Background;
             if (bg is not null)
@@ -140,6 +163,15 @@ namespace Reko.UserInterfaces.Avalonia.Controls
 
         protected override Size MeasureCore(Size availableSize)
         {
+            if (mem is null)
+                return new Size(0, 0);
+            var rc = MeasureSingleLetter();
+            long nLines = (mem.Length + cbLine - 1) / cbLine;
+            return new Size(rc.Width * 100, rc.Height * nLines);
+        }
+        /*
+        protected override Size MeasureCore(Size availableSize)
+        {
             var typeface = new Typeface(FontFamily);
             var txt = new FormattedText(
                 "X",
@@ -155,7 +187,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             var wantedHeight = b.Height * Math.Ceiling(((ByteMemoryArea)mem).Bytes.Length / 16.0);
             return new Size(wantedWidth, wantedHeight);
         }
-
+        */
         protected override void ArrangeCore(Rect finalRect)
         {
             base.ArrangeCore(finalRect);
@@ -165,7 +197,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
 
         private void ClearVisualElements()
         {
-            this.spans = new List<ClientSpan>();
+            this.spans = new List<HexViewer.ClientSpan>();
             this.lines = new List<RenderedLine>();
         }
 
@@ -174,15 +206,9 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             var mem = this.mem;
             if (mem is null)
                 return;
-            var txt = new FormattedText(
-                "X",
-                new Typeface(FontFamily),
-                FontSize,
-                TextAlignment.Center,
-                TextWrapping.NoWrap,
-                Size.Infinity);
-            double dyLine = txt.Bounds.Height;
-            double dxChar = txt.Bounds.Width;
+            Rect bounds = MeasureSingleLetter();
+            double dyLine = bounds.Height;
+            double dxChar = bounds.Width;
             if (dyLine <= 0)
                 return;
             double controlHeight = this.Bounds.Height;
@@ -197,9 +223,22 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             //spans.Add(new TextSpan("Hello Reko!", new Rect(20, 20, 100, 200)));
         }
 
+        private Rect MeasureSingleLetter()
+        {
+            var txt = new FormattedText(
+                "X",
+                new Typeface(FontFamily),
+                FontSize,
+                TextAlignment.Center,
+                TextWrapping.NoWrap,
+                Size.Infinity);
+            var bounds = txt.Bounds;
+            return bounds;
+        }
+
         private RenderedLine RenderLine(int i, double yTopLine, double dxChar, double dyLine)
         {
-            var spans = new TextSpan[16];
+            var spans = new HexViewer.TextSpan[16];
             double x = 0;
             for (int b = 0; b < 16; ++b)
             {
@@ -207,7 +246,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
                 var sByte = this.mem.TryReadByte(offset, out byte by)
                     ? by.ToString("X2") : "  ";
 
-                var span = new TextSpan(sByte, new Rect(b*dxChar*3, yTopLine, 3 * dxChar, dyLine));
+                var span = new HexViewer.TextSpan(sByte, new Rect(b * dxChar * 3, yTopLine, 3 * dxChar, dyLine));
                 spans[b] = span;
                 this.spans.Add(span);
             }
@@ -243,5 +282,22 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             }
         }
 
+        public event EventHandler ScrollInvalidated;
+
+
+        bool ILogicalScrollable.BringIntoView(IControl target, Rect targetRect)
+        {
+            throw new NotImplementedException();
+        }
+
+        IControl ILogicalScrollable.GetControlInDirection(NavigationDirection direction, IControl from)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogicalScrollable.RaiseScrollInvalidated(EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
