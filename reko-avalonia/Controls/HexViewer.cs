@@ -152,7 +152,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             var b = txt.Bounds;
             var c = txt.Constraint;
             var wantedWidth = 16 * b.Width + 15 * b.Width;
-            var wantedHeight = b.Height * Math.Ceiling(((ByteMemoryArea)mem).Bytes.Length / 16.0);
+            var wantedHeight = b.Height * Math.Ceiling(((ByteMemoryArea)mem!).Bytes.Length / 16.0);
             return new Size(wantedWidth, wantedHeight);
         }
 
@@ -204,7 +204,7 @@ namespace Reko.UserInterfaces.Avalonia.Controls
             for (int b = 0; b < 16; ++b)
             {
                 var offset = i * 16 + b;
-                var sByte = this.mem.TryReadByte(offset, out byte by)
+                var sByte = this.mem!.TryReadByte(offset, out byte by)
                     ? by.ToString("X2") : "  ";
 
                 var span = new TextSpan(sByte, new Rect(b*dxChar*3, yTopLine, 3 * dxChar, dyLine));

@@ -1,14 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Windows.Input;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using ReactiveUI;
 using Reko.Core;
+using Reko.Gui;
 using Reko.UserInterfaces.Avalonia.Views;
 
 namespace Reko.UserInterfaces.Avalonia.ViewModels
 {
-    public class MainWindowViewModel : ReactiveObject
+    public class MainWindowViewModel :
+        ReactiveObject,
+        ICommandTarget
     {
         private readonly IFactory? _factory;
         private IRootDock? _layout;
@@ -29,10 +34,15 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
                 }
             }
 
+            this.MenuSystem = new MenuSystem(this);
+            this.ManeMenu = MenuSystem.MainMenu;
+
             NewLayout = ReactiveCommand.Create(ResetLayout);
             FileOpen = ReactiveCommand.Create(OpenFile);
         }
 
+        public MenuSystem MenuSystem { get; }
+        public ObservableCollection<CommandItem> ManeMenu { get; }
         public IRootDock? Layout
         {
             get => _layout;
@@ -175,6 +185,42 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
                 Layout = layout;
                 _factory?.InitLayout(layout);
             }
+        }
+
+        bool ICommandTarget.QueryStatus(CommandID cmdId, CommandStatus status, CommandText text)
+        {
+            if (cmdId.Guid == CmdSets.GuidReko)
+            {
+                switch (cmdId.ID)
+                {
+                case CmdIds.FileOpen:
+                case CmdIds.FileExit:
+                    status.Status = MenuStatus.Enabled | MenuStatus.Visible;
+                    return true;
+                }
+            }
+            else if (cmdId.Guid == CommandIDs.Guid)
+            {
+                status.Status = MenuStatus.Enabled | MenuStatus.Visible;
+            }
+            return false;
+        }
+
+        bool ICommandTarget.Execute(CommandID cmdId)
+        {
+            if (cmdId.Guid == CmdSets.GuidReko)
+            {
+                switch (cmdId.ID)
+                {
+                case CmdIds.FileOpen:
+                    OpenFile();
+                    return true;
+                case CmdIds.FileExit:
+                    MainWindow?.Close();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

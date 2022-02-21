@@ -9,9 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Control = global::Avalonia.Controls.Control;
 using ReactiveUI;
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Controls;
 using Reko.Core;
 using System.Diagnostics;
 using Avalonia.Media.TextFormatting;
@@ -239,11 +237,10 @@ namespace Reko.UserInterfaces.Avalonia.Controls
         private RenderedLine RenderLine(int i, double yTopLine, double dxChar, double dyLine)
         {
             var spans = new HexViewer.TextSpan[16];
-            double x = 0;
             for (int b = 0; b < 16; ++b)
             {
                 var offset = i * 16 + b;
-                var sByte = this.mem.TryReadByte(offset, out byte by)
+                var sByte = this.mem!.TryReadByte(offset, out byte by)
                     ? by.ToString("X2") : "  ";
 
                 var span = new HexViewer.TextSpan(sByte, new Rect(b * dxChar * 3, yTopLine, 3 * dxChar, dyLine));

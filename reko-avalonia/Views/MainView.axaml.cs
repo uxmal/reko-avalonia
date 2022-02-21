@@ -15,6 +15,11 @@ namespace Reko.UserInterfaces.Avalonia.Views
             InitializeMenu();
         }
 
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            base.OnDataContextChanged(e);
+        }
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
@@ -39,7 +44,8 @@ namespace Reko.UserInterfaces.Avalonia.Views
 
         private void InitializeMenu()
         {
-            this.FindControl<MenuItem>("OptionsIsDragEnabled").Click += (_, _) =>
+            /*
+            this.FindControl<MenuItem>("OptionsIsDragEnabled")?.Click += (_, _) =>
             {
                 if (VisualRoot is Window window)
                 {
@@ -56,6 +62,7 @@ namespace Reko.UserInterfaces.Avalonia.Views
                     window.SetValue(DockProperties.IsDropEnabledProperty, !isEnabled);
                 }
             };
+            */
         }
     }
 }
