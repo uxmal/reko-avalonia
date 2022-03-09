@@ -29,7 +29,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
         {
             if (parameter is CommandID cmdid)
             {
-                target.Execute(cmdid);
+                var x = target.ExecuteAsync(cmdid).Result;
             }
         }
     }

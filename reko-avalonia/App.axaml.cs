@@ -3,9 +3,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
+using Reko.Core;
+using Reko.Core.Configuration;
 using Reko.UserInterfaces.Avalonia.ViewModels;
 using Reko.UserInterfaces.Avalonia.Views;
 using System;
+using System.ComponentModel.Design;
 
 namespace Reko.UserInterfaces.Avalonia
 {
@@ -54,7 +57,10 @@ namespace Reko.UserInterfaces.Avalonia
         {
             // DockManager.s_enableSplitToWindow = true;
 
-            var mainWindowViewModel = new MainWindowViewModel();
+            var sc = new ServiceContainer();
+            var cfgSvc = RekoConfigurationService.Load(sc, "reko/reko.config");
+            sc.AddService<IConfigurationService>(cfgSvc);
+            var mainWindowViewModel = new MainWindowViewModel(sc);
 
             switch (ApplicationLifetime)
             {

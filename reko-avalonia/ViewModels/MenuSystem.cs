@@ -74,7 +74,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
         {
             if (parameter is not null && this.CommandTarget is not null)
             {
-                this.CommandTarget.Execute((CommandID?)parameter);
+                var x = this.CommandTarget.ExecuteAsync((CommandID?)parameter).Result;
                 //RefreshMenus();
             }
         }

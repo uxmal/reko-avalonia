@@ -1,12 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using ReactiveUI;
 using Reko.Core;
 using Reko.Gui;
+using Reko.UserInterfaces.Avalonia.ViewModels.Documents;
 using Reko.UserInterfaces.Avalonia.Views;
 
 namespace Reko.UserInterfaces.Avalonia.ViewModels
@@ -18,7 +21,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
         private readonly IFactory? _factory;
         private IRootDock? _layout;
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IServiceProvider services)
         {
             _factory = new DockFactory(new Project());
 
@@ -33,6 +36,8 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
                     root.Navigate.Execute("Home");
                 }
             }
+
+            AddArchitecturePropertiesView(services);
 
             this.MenuSystem = new MenuSystem(this);
             this.ManeMenu = MenuSystem.MainMenu;
@@ -160,6 +165,13 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
             }
         }
 
+        private void AddArchitecturePropertiesView(IServiceProvider services)
+        {
+            var docDock = _factory.GetDockable<IDock>("Documents");
+            docDock.VisibleDockables.Add(new ArchitecturePropertiesViewModel(services));
+        }
+
+
         public async void OpenFile()
         {
             if (MainWindow is null)
@@ -206,7 +218,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
             return false;
         }
 
-        bool ICommandTarget.Execute(CommandID cmdId)
+        ValueTask<bool> ICommandTarget.ExecuteAsync(CommandID cmdId)
         {
             if (cmdId.Guid == CmdSets.GuidReko)
             {
@@ -214,13 +226,13 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
                 {
                 case CmdIds.FileOpen:
                     OpenFile();
-                    return true;
+                    return ValueTask.FromResult(true);
                 case CmdIds.FileExit:
                     MainWindow?.Close();
-                    return true;
+                    return ValueTask.FromResult(true);
                 }
             }
-            return false;
+            return ValueTask.FromResult(false);
         }
     }
 }

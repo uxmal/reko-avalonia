@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:g="using:Avalonia.Controls"
+			 xmlns:c="using:Reko.UserInterfaces.Avalonia.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:CompileBindings="True"
+			 x:DataType="c:PropertyGridViewModel"
+             x:Class="Reko.UserInterfaces.Avalonia.Controls.PropertyGrid">
+	<StackPanel Background="LightBlue">
+		<TextBlock>&lt;Testing Datagrid&gt;</TextBlock>
+
+		<Border Padding="2" BorderBrush="#C0C0C0" BorderThickness="2">
+			<ItemsRepeater Items="{Binding PropertyItems}">
+				<ItemsRepeater.Styles>
+					<Style Selector="Border">
+						<Setter Property="Background" Value="Transparent" />
+					</Style>
+					<Style Selector="Border.propSelected">
+						<Setter	Property="Background" Value="Red" />
+					</Style>
+				</ItemsRepeater.Styles>
+				<ItemsRepeater.ItemTemplate>
+					<DataTemplate>
+						<Grid ColumnDefinitions="2*,3*" x:DataType="c:PropertyItem">
+							<Border Grid.Column="0" BorderThickness="1" BorderBrush="Black" 
+									Classes.propSelected="{Binding Selected}"
+									PointerPressed ="propName_PointerPressed">
+								<TextBlock Text="{Binding Name}" />
+							</Border>
+							<Border Grid.Column="1" BorderThickness="1" BorderBrush="Black"
+									Classes="PropValue PropGridCell"
+									Background="Transparent"
+									PointerPressed ="propValue_PointerPressed">
+								<TextBlock Text="{Binding Value}" />
+							</Border>
+						</Grid>
+					</DataTemplate>
+				</ItemsRepeater.ItemTemplate>
+			</ItemsRepeater>
+		</Border>
+		<Border Padding="2" BorderBrush="Red">
+			<StackPanel>
+				<TextBlock Name="PropertyName" Text="{Binding SelectedPropertyName}" />
+				<TextBlock Name="PropertyDescription" Text="{Binding SelectedPropertyDescription}" />
+			</StackPanel>
+		</Border>
+		<TextBlock>&lt;Testing Datgrid&gt;</TextBlock>
+	</StackPanel>
+</UserControl>

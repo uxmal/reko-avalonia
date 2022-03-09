@@ -20,7 +20,6 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
     {
         private readonly object _context;
         private IRootDock? _rootDock;
-        private IDocumentDock? _documentDock;
 
         public DockFactory(object context)
         {
@@ -28,6 +27,8 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
         }
 
         public override IDocumentDock CreateDocumentDock() => new CustomDocumentDock();
+
+        public IDocumentDock? DocumentDock { get; private set; }
 
         public override IRootDock CreateLayout()
         {
@@ -153,7 +154,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
             rootDock.DefaultDockable = homeView;
             rootDock.VisibleDockables = CreateList<IDockable>(homeView);
 
-            _documentDock = documentDock;
+            DocumentDock = documentDock;
             _rootDock = rootDock;
             
             return rootDock;
@@ -180,7 +181,7 @@ namespace Reko.UserInterfaces.Avalonia.ViewModels
             DockableLocator = new Dictionary<string, Func<IDockable?>>()
             {
                 ["Root"] = () => _rootDock,
-                ["Documents"] = () => _documentDock
+                ["Documents"] = () => DocumentDock
             };
 
             HostWindowLocator = new Dictionary<string, Func<IHostWindow>>
